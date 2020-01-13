@@ -35,36 +35,6 @@ api = tweepy.API(auth, wait_on_rate_limit=True, wait_on_rate_limit_notify=True)
 user = api.me()
 print('\nUser: ' + user.name + '\n')
 
-hashtag = ''
-
-if user.name == '75befreiung':
-    hashtag = '#75befreiung'
-if user.name == '75liberation':
-    hashtag = '#75liberation'
-
-
-class MyStreamListener(tweepy.StreamListener):
-
-    def on_status(self, status):
-        global hashtag
-        if 'RT @' not in status.text and status.in_reply_to_status_id is None and hashtag in status.text:
-            try:
-                api.retweet(status.id)
-            except tweepy.TweepError as te:
-                print(te.reason)
-
-            print('Successfully retweeted!\nTweet: "' + status.text + '"\nID: ' + str(status.id))
-
-    def on_error(self, status_code):
-        if status_code == 420:
-            return False
-
-
-listener = MyStreamListener()
-stream = tweepy.Stream(auth, listener)
-if stream:
-    print('Listening to stream...\n')
-
 with open('users.csv', newline='') as f:
     reader = csv.reader(f)
     users = list(next(reader))
@@ -72,12 +42,31 @@ with open('users.csv', newline='') as f:
 user_objects = api.lookup_users(screen_names=users)
 user_ids = [user.id_str for user in user_objects]
 
-try:
-    stream.filter(follow=user_ids, is_async=True)
-except tweepy.TweepError as e:
-    print(e.reason)
 
-print('Tracked hashtag: ' + hashtag + '\n')
-print(len(user_objects), 'tracked users:')
-for user in user_objects:
-    print('User:\t', user.screen_name, '\nID:\t\t', user.id_str)
+class MyStreamListener(tweepy.StreamListener):
+
+    def on_status(self, status):
+        if 'RT @' not in status.text and status.user.id_str in user_ids:
+            try:
+                api.retweet(status.id)
+                print('Successfully retweeted!\nTweet: "' + status.text + '"\nID: ' + str(status.id))
+                print('***********************************************')
+            except tweepy.TweepError as te:
+                    print(te.reason)
+
+    def on_error(self, status_code):
+        if status_code == 420:
+            print("Error ratelimit: " + str(status_code))
+            return False
+
+
+hashtag = ''
+
+if user.name == '75befreiung':
+    hashtag = '#75befreiung'
+if user.name == '75liberation':
+    hashtag = '#75liberation'
+
+listener = MyStreamListener()
+stream = tweepy.Stream(auth, listener)
+stream.filter(track=[hashtag], is_async=True)
