@@ -55,9 +55,12 @@ class MyStreamListener(tweepy.StreamListener):
                     print(te.reason)
 
     def on_error(self, status_code):
+        print("Error. Waiting for rate limit")
+        time.sleep(60*3)
         if status_code == 420:
-            print("Error ratelimit: " + str(status_code))
+            print("Ratelimit: " + str(status_code))
             return False
+        print("Status Code: " + str(status_code))
 
 
 hashtag = ''
