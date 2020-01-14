@@ -47,7 +47,8 @@ user_ids = [user.id_str for user in user_objects]
 class MyStreamListener(tweepy.StreamListener):
 
     def on_status(self, status):
-        if 'RT @' not in status.text and status.user.id_str in user_ids:
+        tweet_text = status.text if status.truncated is not True else status.extended_tweet['full_text']
+        if 'RT @' not in tweet_text and status.user.id_str in user_ids:
             try:
                 api.retweet(status.id)
                 print('Successfully retweeted!\nTweet: "' + status.text + '"\nID: ' + str(status.id))
