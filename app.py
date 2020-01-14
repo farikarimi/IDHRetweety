@@ -63,7 +63,7 @@ class MyStreamListener(tweepy.StreamListener):
         if 'RT @' not in tweet_text and status.user.id_str in user_ids:
             try:
                 api.retweet(status.id)
-                print('Successfully retweeted!\nTweet: "' + status.text + '"\nID: ' + str(status.id))
+                print('Successfully retweeted!\nID: ' + str(status.id))
                 print('***********************************************')
             except tweepy.TweepError as te:
                     print(te.reason)
