@@ -3,6 +3,7 @@ import access_credentials
 import webbrowser
 import re
 import csv
+import time
 
 auth = tweepy.OAuthHandler(access_credentials.consumer_key, access_credentials.consumer_key_secret)
 
