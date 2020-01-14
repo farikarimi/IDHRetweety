@@ -4,6 +4,18 @@ import webbrowser
 import re
 import csv
 import time
+import smtplib
+
+
+def send_error_mail(error_str):
+    server = smtplib.SMTP("smtp.uni-koeln.de")
+    server.sendmail("retweety@idh.de", ["fkarimi1@uni-koeln.de",
+                                        "karimi.farimah@uni-koeln.de",
+                                        "Dennis.Demmer@uni-koeln.de"],
+                    "Subject: Twitter Error.\n\n Twitter Error: " + error_str)
+    server.quit()
+    print("Error report send")
+
 
 auth = tweepy.OAuthHandler(access_credentials.consumer_key, access_credentials.consumer_key_secret)
 
@@ -55,9 +67,11 @@ class MyStreamListener(tweepy.StreamListener):
                 print('***********************************************')
             except tweepy.TweepError as te:
                     print(te.reason)
+                    send_error_mail(str(te.reason))
 
     def on_error(self, status_code):
-        print("Error. Waiting for rate limit")
+        print("Error with code: " + str(status_code))
+        send_error_mail(str(status_code))
         time.sleep(90)
         if status_code == 420:
             print("Ratelimit: " + str(status_code))
