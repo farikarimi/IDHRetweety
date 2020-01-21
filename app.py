@@ -10,11 +10,10 @@ import smtplib
 def send_error_mail(error_str):
     server = smtplib.SMTP("smtp.uni-koeln.de")
     server.sendmail("retweety@idh.de", ["fkarimi1@uni-koeln.de",
-                                        "karimi.farimah@uni-koeln.de",
                                         "Dennis.Demmer@uni-koeln.de"],
                     "Subject: Twitter Error.\n\n Twitter Error: " + error_str)
     server.quit()
-    print("Error report send")
+    print("Error report sent.")
 
 
 auth = tweepy.OAuthHandler(access_credentials.consumer_key, access_credentials.consumer_key_secret)
